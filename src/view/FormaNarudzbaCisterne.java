@@ -16,11 +16,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JMenuItem;
@@ -41,7 +45,8 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
     /**
      * Creates new form FormaTvrtka
      */
-    private NarudzbaGorivo narudzbaGorivo;
+    private List<NarudzbaGorivo> narudzbaGorivo;
+    private ArrayList<NarudzbaGorivo> narudzbaGorivoList = new ArrayList();
 
     private List<Gorivo> goriva;
 
@@ -55,13 +60,13 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         definirajKalendare();
         ucitajBenzinskeCrpke();
         goriva = HibernateUtil.getSession().createQuery("from Gorivo a where a.obrisan=false").list();
-        narudzbaGorivo = (NarudzbaGorivo) HibernateUtil.getSession().createQuery("from NarudzbaGorivo a where a.obrisan=false").uniqueResult();
+        narudzbaGorivo = HibernateUtil.getSession().createQuery("from NarudzbaGorivo a where a.obrisan=false").list();
         this.getContentPane().setBackground(Color.LIGHT_GRAY);
         this.setTitle("Narudžbe");
         this.setLocationRelativeTo(null);
         definirajDesniKlikNaPolaznicima();
         ucitaj();
-
+        ucitajSvaGoriva();
     }
 
     private void definirajKalendare() {
@@ -102,12 +107,27 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
                     item.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             Gorivo g = lstGoriva.getSelectedValue();
-                            NarudzbaGorivo ng = new NarudzbaGorivo();
-                            ng.setGorivo(g);
-                            ng.setNarudzbaCisterne(entitet);
-                            entitet.getNarudzbaGoriva().remove(ng);
+                            NarudzbaGorivo ngTemp = null;
+                            for (NarudzbaGorivo ng : narudzbaGorivo) {
+                                if (ng.getNarudzbaCisterne() != null && entitet.getSifra() != null && Objects.equals(ng.getNarudzbaCisterne().getSifra(), entitet.getSifra())) {
+                                    if (ng.getGorivo() != null && Objects.equals(ng.getGorivo().getSifra(), g.getSifra())) {
+                                        ng.setGorivo(null);
+                                        ng.setNarudzbaCisterne(null);
+                                        ng.setObrisan(true);
+                                        ngTemp = ng;
+                                        break;
 
-                            spremi();
+                                        //obriši ng
+                                    }
+                                }
+                            }
+                            if (ngTemp != null) {
+                                //spremi - s obrisan = true
+                                test(ngTemp);
+                                ucitajSvaGorivaZaNarudzbu();
+                                ucitajSvaGoriva();
+                            }
+                            //spremi();
                         }
                     });
                     menu.add(item);
@@ -117,6 +137,10 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
                 }
             }
         });
+    }
+
+    public void test(NarudzbaGorivo ngTemp) {
+        super.spremi(ngTemp);
     }
 
     private void ucitajBenzinskeCrpke() {
@@ -134,25 +158,70 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         }
     }
 
-    private void ucitajGoriva() {
-
+    private void ucitajSvaGoriva() {
+        
         DefaultComboBoxModel<Gorivo> model = new DefaultComboBoxModel<Gorivo>();
-        goriva.stream().forEach((g) -> {
-            if (entitet != null) {
-                boolean dodaj = true;
-                for (NarudzbaGorivo ng : entitet.getNarudzbaGoriva()) {
-                    if (g.getSifra().equals(ng.getGorivo().getSifra())) {
-                        dodaj = false;
-                        break;
-                    }
-                }
-                if (dodaj) {
-                    model.addElement(g);
-                }
-            }
-        });
+        cmbGorivo.setModel(model);
+        List<Gorivo> list = HibernateUtil.getSession().
+                createQuery("from Gorivo a where a.obrisan=false").list();
+        for (Gorivo g : list) {
+            model.addElement(g);
+            cmbGorivo.setSelectedItem(g);
+        }
+    }
 
-        //cmbGorivo.setModel(model);
+    private void ucitajSvaGorivaZaNarudzbu() {
+        DefaultComboBoxModel<Gorivo> model = new DefaultComboBoxModel<Gorivo>();
+        cmbGorivo.setModel(model);
+        String inQuery = "";
+        ArrayList<Long> list1 = new ArrayList();
+        for (NarudzbaGorivo ng : narudzbaGorivo) {
+            if (ng.getGorivo() != null) {
+                list1.add(ng.getGorivo().getSifra());
+                inQuery += ng.getGorivo().getSifra() + ", ";
+            }
+        }
+        if (inQuery.endsWith(", ")) {
+            inQuery = inQuery.substring(0, inQuery.length() - 2);
+        }
+        List<Gorivo> list = HibernateUtil.getSession().
+                createQuery("from Gorivo a where sifra in (" + inQuery + ") and  a.obrisan=false").list();
+
+        DefaultListModel<Gorivo> nc = new DefaultListModel<>();
+        lstGoriva.setModel(nc);
+        if (list != null && list.size() > 0) {
+            for (Gorivo g : list) {
+                nc.addElement(g);
+            }
+        }
+    }
+
+    private void ucitajGorivaZaNarudzbu(ArrayList<NarudzbaGorivo> narudzbaGorivo) {
+        int index = lstGoriva.getSelectedIndex();
+        DefaultComboBoxModel<Gorivo> model = new DefaultComboBoxModel<Gorivo>();
+        cmbGorivo.setModel(model);
+        String inQuery = "";
+        ArrayList<Long> list1 = new ArrayList();
+        for (NarudzbaGorivo ng : narudzbaGorivo) {
+            if (ng.getGorivo() != null) {
+                list1.add(ng.getGorivo().getSifra());
+                inQuery += ng.getGorivo().getSifra() + ", ";
+            }
+        }
+        if (inQuery.endsWith(", ")) {
+            inQuery = inQuery.substring(0, inQuery.length() - 2);
+        }
+        List<Gorivo> list = HibernateUtil.getSession().
+                createQuery("from Gorivo a where sifra in (" + inQuery + ") and  a.obrisan=false").list();
+
+        DefaultListModel<Gorivo> nc = new DefaultListModel<>();
+        lstGoriva.setModel(nc);
+        if (list != null && list.size() > 0) {
+            for (Gorivo g : list) {
+                nc.addElement(g);
+            }
+        }
+        lstGoriva.setSelectedIndex(index);
     }
 
     @Override
@@ -419,9 +488,6 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         if (lstNarudzba.getSelectedValue() == null) {
             return;
         }
-        if (cmbGorivo.getSelectedItem() == null) {
-            return;
-        }
 
         try {
             this.entitet = lstNarudzba.getSelectedValue();
@@ -430,21 +496,39 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
             txtVrijemeNarudzbe.setText(entitet.getVrijemeNarudzbe().toString());
             txtVrijemeIsporuke.setText(entitet.getVrijemeIsporuke().toString());
             cmbBenzinskaCrpka.setSelectedItem(entitet.getBenzinskaCrpka());
-            txtNabavnaCijena.setText(narudzbaGorivo.getNabavnaCijena().toString());
-            txtKolicina.setText(narudzbaGorivo.getKolicina().toString());
-            cmbGorivo.setSelectedItem(entitet.getNarudzbaGoriva().contains(Gorivo));
+            narudzbaGorivoList = new ArrayList();
+            for (NarudzbaGorivo ng : narudzbaGorivo) {
+                if (ng.getNarudzbaCisterne() != null && entitet.getSifra() != null && Objects.equals(ng.getNarudzbaCisterne().getSifra(), entitet.getSifra())) {
+                    narudzbaGorivoList.add(ng);
+                    break;
+                }
+            }
+            if (narudzbaGorivoList.size() > 0) {
+                txtKolicina.setText(narudzbaGorivoList.get(0).getKolicina().toString());
+                txtNabavnaCijena.setText(narudzbaGorivoList.get(0).getNabavnaCijena().toString());
+                ucitajSvaGorivaZaNarudzbu();
+                ucitajSvaGoriva();
+            } else {
+                txtKolicina.setText("");
+                txtNabavnaCijena.setText("");
+                if (lstGoriva.getModel() != null) {
+                    if (lstGoriva.getModel() instanceof DefaultListModel) {
+                        DefaultListModel listModel = (DefaultListModel) lstGoriva.getModel();
+                        listModel.removeAllElements();
+                    }
+                }
+                ucitajSvaGoriva();
 
+            }
+            //cmbGorivo.setSelectedItem(entitet.getNarudzbaGoriva().contains(Gorivo));
 //            cmbBenzinskaCrpka.setSelectedItem(entitet.getBenzinskaCrpka());
-
 //            DefaultListModel<Gorivo> go = new DefaultListModel<>();
 //            lstGoriva.setModel(go);
 //            goriva.forEach((s) -> {
 //                go.addElement(s);
 //            });
-            ucitajGoriva();
-
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }//GEN-LAST:event_lstNarudzbaValueChanged
 
@@ -463,21 +547,48 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
     }//GEN-LAST:event_btnPromjeniActionPerformed
     @Override
     protected void spremi() {
-
-        entitet.setVrijemeNarudzbe(Date.from(datumNarudzbe.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        entitet.setVrijemeIsporuke(Date.from(datumIsporuke.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        if (datumNarudzbe.getDate() != null) {
+            entitet.setVrijemeNarudzbe(Date.from(datumNarudzbe.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        }
+        if (datumIsporuke.getDate() != null) {
+            entitet.setVrijemeIsporuke(Date.from(datumIsporuke.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        }
         entitet.setTrosak(new BigDecimal(txtTrosak.getText()));
         entitet.setBenzinskaCrpka(cmbBenzinskaCrpka.getItemAt(cmbBenzinskaCrpka.getSelectedIndex()));
-        entitet.setNarudzbaGoriva((List<NarudzbaGorivo>) new BigDecimal(txtKolicina.getText()));
-        entitet.setNarudzbaGoriva((List<NarudzbaGorivo>) new BigDecimal(txtNabavnaCijena.getText()));
+        NarudzbaGorivo narudzba = new NarudzbaGorivo();
+        narudzba.setKolicina(new BigDecimal(txtKolicina.getText()));
+        narudzba.setNabavnaCijena(new BigDecimal(txtNabavnaCijena.getText()));
+        if (cmbGorivo == null || cmbGorivo.getModel() == null || cmbGorivo.getModel().getSize() < 1 || cmbGorivo.getSelectedIndex() < 0) {
+            narudzba.setGorivo(null);
+        } else {
+            narudzba.setGorivo(cmbGorivo.getItemAt(cmbGorivo.getSelectedIndex()));
+        }
 
-        //narudzbaGorivo.setKolicina(new BigDecimal(txtKolicina.getText()));
-        //narudzbaGorivo.setNabavnaCijena(new BigDecimal(txtNabavnaCijena.getText()));
-        narudzbaGorivo.setGorivo(cmbGorivo.getItemAt(cmbGorivo.getSelectedIndex()));
-
-        super.spremi();
-
+        super.spremi(narudzba);
     }
+
+    private void dodajGorivo(NarudzbaGorivo narudzba) {
+        if (datumNarudzbe.getDate() != null) {
+            entitet.setVrijemeNarudzbe(Date.from(datumNarudzbe.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        }
+        if (datumIsporuke.getDate() != null) {
+            entitet.setVrijemeIsporuke(Date.from(datumIsporuke.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        }
+        entitet.setTrosak(new BigDecimal(txtTrosak.getText()));
+        entitet.setBenzinskaCrpka(cmbBenzinskaCrpka.getItemAt(cmbBenzinskaCrpka.getSelectedIndex()));
+        super.spremi(narudzba);
+        narudzbaGorivo = HibernateUtil.getSession().createQuery("from NarudzbaGorivo a where a.obrisan=false").list();
+        narudzbaGorivoList = new ArrayList();
+        for (NarudzbaGorivo ng : narudzbaGorivo) {
+            if (ng.getNarudzbaCisterne() != null && entitet.getSifra() != null && Objects.equals(ng.getNarudzbaCisterne().getSifra(), entitet.getSifra())) {
+                narudzbaGorivoList.add(ng);
+                break;
+            }
+        }
+        ucitajGorivaZaNarudzbu(narudzbaGorivoList);
+        ucitajSvaGoriva();
+    }
+
     private void btnObrisiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnObrisiActionPerformed
         if (lstNarudzba.getSelectedValue() == null) {
             JOptionPane.showConfirmDialog(rootPane, "Prvo odaberite stavku");
@@ -498,8 +609,9 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         NarudzbaGorivo ng = new NarudzbaGorivo();
         ng.setGorivo(g);
         ng.setNarudzbaCisterne(entitet);
-        entitet.getNarudzbaGoriva().add(ng);
-        spremi();
+        ng.setKolicina(new BigDecimal(txtKolicina.getText()));
+        ng.setNabavnaCijena(new BigDecimal(txtNabavnaCijena.getText()));
+        dodajGorivo(ng);
     }//GEN-LAST:event_btnDodajGorivoActionPerformed
 
     /**

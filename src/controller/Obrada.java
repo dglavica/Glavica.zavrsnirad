@@ -60,7 +60,7 @@ public class Obrada<T extends Entitet> {
             entitet.setDatumPromjene(d);
             session.saveOrUpdate(entitet);
         });
-        session.getTransaction().commit();
+        session.getTransaction().commit();;
         return lista;
     }
 

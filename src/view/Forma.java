@@ -8,6 +8,7 @@ package view;
 import controller.Obrada;
 import javax.swing.JFrame;
 import model.Entitet;
+import model.NarudzbaCisterne;
 import model.NarudzbaGorivo;
 
 /**
@@ -31,6 +32,13 @@ public abstract class Forma<T extends Entitet> extends JFrame {
     }
     
     protected void spremi(NarudzbaGorivo narudzbaGorivo) {
+        entitet = obrada.save(entitet);
+        spremi(entitet, narudzbaGorivo);
+        ucitaj();
+    }
+    
+    protected void spremi(Entitet entitet, NarudzbaGorivo narudzbaGorivo) {
+        narudzbaGorivo.setNarudzbaCisterne((NarudzbaCisterne) entitet);
         obrada.save(narudzbaGorivo);
         ucitaj();
     }

@@ -7,6 +7,7 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
@@ -78,8 +79,8 @@ public class NarudzbaCisterne extends Entitet implements Serializable {
     }
     
     @Override
-    public String toString() {
-        return "NarudzbaCisterne{" + "narudzbaGoriva=" + narudzbaGoriva + ", benzinskaCrpka=" + benzinskaCrpka + '}';
+    public String toString() { 
+        return String.format("Br. %d., %s, %s", getSifra(), getVrijemeNarudzbe(), benzinskaCrpka.getNaziv());
     }
 
 }
