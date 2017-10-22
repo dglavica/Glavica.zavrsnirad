@@ -7,6 +7,7 @@ package view;
 
 import Pomocno.HibernateUtil;
 import controller.Obrada;
+import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -36,6 +37,9 @@ public class FormaDjelatnik extends Forma<Djelatnik> {
         initComponents();
         obrada = new Obrada();
         ucitajBenzinskaCrpka();
+        this.setLocationRelativeTo(null);
+        this.getContentPane().setBackground(Color.LIGHT_GRAY);
+        this.setTitle("Djelatnici");
         ucitaj();
 
     }
@@ -164,6 +168,14 @@ public class FormaDjelatnik extends Forma<Djelatnik> {
             }
         });
 
+        txtIban.setBackground(new java.awt.Color(204, 255, 255));
+
+        txtOib.setBackground(new java.awt.Color(204, 255, 255));
+
+        txtPrezime.setBackground(new java.awt.Color(204, 255, 255));
+
+        txtIme.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel2.setText("Ime");
 
         jLabel3.setText("Prezime");
@@ -174,8 +186,13 @@ public class FormaDjelatnik extends Forma<Djelatnik> {
 
         jLabel6.setText("Email");
 
+        txtEmail.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel7.setText("Plaća");
 
+        txtPlaca.setBackground(new java.awt.Color(204, 255, 255));
+
+        stablo.setBackground(new java.awt.Color(204, 255, 255));
         stablo.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 stabloValueChanged(evt);

@@ -7,6 +7,7 @@ package view;
 
 import Pomocno.HibernateUtil;
 import controller.Obrada;
+import java.awt.Color;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -26,6 +27,9 @@ public class FormaBenzinskaCrpka extends Forma<BenzinskaCrpka> {
     public FormaBenzinskaCrpka() {
         initComponents();
         obrada = new Obrada();
+        this.setLocationRelativeTo(null);
+        this.getContentPane().setBackground(Color.LIGHT_GRAY);
+        this.setTitle("Benzinske crpke");
 
         ucitaj();
     }
@@ -90,6 +94,7 @@ public class FormaBenzinskaCrpka extends Forma<BenzinskaCrpka> {
             }
         });
 
+        lstBenzinskeCrpke.setBackground(new java.awt.Color(204, 255, 255));
         lstBenzinskeCrpke.setToolTipText("");
         lstBenzinskeCrpke.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -100,11 +105,19 @@ public class FormaBenzinskaCrpka extends Forma<BenzinskaCrpka> {
 
         jLabel1.setText("Naziv");
 
+        txtNaziv.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel3.setText("Adresa");
+
+        txtAdresa.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel4.setText("OIB");
 
+        txtOib.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel5.setText("Email");
+
+        txtEmail.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel6.setText("Lista benzinskih crpki");

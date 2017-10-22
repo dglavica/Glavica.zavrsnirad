@@ -5,6 +5,7 @@
  */
 package view;
 
+import java.awt.Color;
 import javax.swing.ImageIcon;
 
 /**
@@ -18,6 +19,9 @@ public class FormaERA extends javax.swing.JFrame {
      */
     public FormaERA() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        this.getContentPane().setBackground(Color.LIGHT_GRAY);
+        this.setTitle("ERA dijagram");
         
     }
 

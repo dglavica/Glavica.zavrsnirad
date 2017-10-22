@@ -7,6 +7,7 @@ package view;
 
 import Pomocno.HibernateUtil;
 import controller.Obrada;
+import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -27,6 +28,9 @@ public class FormaGorivo extends Forma<Gorivo> {
     public FormaGorivo() {
         initComponents();
         obrada = new Obrada();
+        this.getContentPane().setBackground(Color.LIGHT_GRAY);
+        this.setTitle("Goriva");
+        this.setLocationRelativeTo(null);
 
         ucitaj();
     }
@@ -37,7 +41,7 @@ public class FormaGorivo extends Forma<Gorivo> {
         rezultati = HibernateUtil.getSession().createQuery("from Gorivo a where a.obrisan=false").list();
         ucitavanje();
     }
-    
+
     private void ucitavanje() {
         DefaultListModel<Gorivo> g = new DefaultListModel<>();
         lstGoriva.setModel(g);
@@ -75,6 +79,7 @@ public class FormaGorivo extends Forma<Gorivo> {
             }
         });
 
+        lstGoriva.setBackground(new java.awt.Color(204, 255, 255));
         lstGoriva.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 lstGorivaValueChanged(evt);
@@ -87,10 +92,17 @@ public class FormaGorivo extends Forma<Gorivo> {
 
         jLabel2.setText("Vrsta");
 
+        txtVrsta.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel3.setText("Prodajna cijena");
+
+        txtProdajnaCijena.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel4.setText("Kapacitet spremnika");
 
+        txtKapacitetSpremnika.setBackground(new java.awt.Color(204, 255, 255));
+
+        btnDodaj.setBackground(new java.awt.Color(255, 255, 255));
         btnDodaj.setText("Dodaj");
         btnDodaj.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -98,6 +110,7 @@ public class FormaGorivo extends Forma<Gorivo> {
             }
         });
 
+        btnPromjeni.setBackground(new java.awt.Color(255, 255, 255));
         btnPromjeni.setText("Promjeni");
         btnPromjeni.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -105,6 +118,7 @@ public class FormaGorivo extends Forma<Gorivo> {
             }
         });
 
+        btnObrisi.setBackground(new java.awt.Color(255, 255, 255));
         btnObrisi.setText("Obriši");
         btnObrisi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

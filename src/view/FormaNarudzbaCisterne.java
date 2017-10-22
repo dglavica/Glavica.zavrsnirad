@@ -9,18 +9,24 @@ import Pomocno.HibernateUtil;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
-import static com.sun.corba.se.impl.util.Utility.printStackTrace;
 import controller.Obrada;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import model.BenzinskaCrpka;
 import model.Gorivo;
 import model.NarudzbaCisterne;
@@ -41,15 +47,19 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
 
     private DatePicker datumNarudzbe;
     private DatePicker datumIsporuke;
+    private Object Gorivo;
 
     public FormaNarudzbaCisterne() {
         initComponents();
         obrada = new Obrada();
-
         definirajKalendare();
         ucitajBenzinskeCrpke();
         goriva = HibernateUtil.getSession().createQuery("from Gorivo a where a.obrisan=false").list();
-
+        narudzbaGorivo = (NarudzbaGorivo) HibernateUtil.getSession().createQuery("from NarudzbaGorivo a where a.obrisan=false").uniqueResult();
+        this.getContentPane().setBackground(Color.LIGHT_GRAY);
+        this.setTitle("Narudžbe");
+        this.setLocationRelativeTo(null);
+        definirajDesniKlikNaPolaznicima();
         ucitaj();
 
     }
@@ -75,6 +85,38 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         datumIsporuke.setLocale(new Locale("hr"));
         pnlDatumIsporuke.add(datumIsporuke);
 
+    }
+
+    private void definirajDesniKlikNaPolaznicima() {
+        lstGoriva.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+
+                if (SwingUtilities.isRightMouseButton(e)) {
+
+                    if (lstGoriva.getSelectedValue() == null) {
+                        return;
+                    }
+
+                    JPopupMenu menu = new JPopupMenu();
+                    JMenuItem item = new JMenuItem("Obriši");
+                    item.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            Gorivo g = lstGoriva.getSelectedValue();
+                            NarudzbaGorivo ng = new NarudzbaGorivo();
+                            ng.setGorivo(g);
+                            ng.setNarudzbaCisterne(entitet);
+                            entitet.getNarudzbaGoriva().remove(ng);
+
+                            spremi();
+                        }
+                    });
+                    menu.add(item);
+                    menu.show(lstGoriva, 25, lstGoriva.getCellBounds(
+                            lstGoriva.getSelectedIndex() + 1,
+                            lstGoriva.getSelectedIndex() + 1).y);
+                }
+            }
+        });
     }
 
     private void ucitajBenzinskeCrpke() {
@@ -110,8 +152,7 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
             }
         });
 
-        cmbGorivo.setModel(model);
-
+        //cmbGorivo.setModel(model);
     }
 
     @Override
@@ -173,6 +214,7 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        lstNarudzba.setBackground(new java.awt.Color(204, 255, 255));
         lstNarudzba.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 lstNarudzbaValueChanged(evt);
@@ -183,9 +225,13 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setText("Popis narudzbi");
 
+        txtVrijemeNarudzbe.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel2.setText("Datum narudžbe");
 
         jLabel3.setText("Datum Isporuke");
+
+        txtVrijemeIsporuke.setBackground(new java.awt.Color(204, 255, 255));
 
         btnDodaj.setText("Dodaj");
         btnDodaj.addActionListener(new java.awt.event.ActionListener() {
@@ -208,6 +254,8 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
             }
         });
 
+        txtTrosak.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel6.setText("Trošak");
 
         cmbBenzinskaCrpka.addActionListener(new java.awt.event.ActionListener() {
@@ -222,8 +270,13 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
 
         jLabel7.setText("Količina");
 
+        txtKolicina.setBackground(new java.awt.Color(204, 255, 255));
+
         jLabel8.setText("Nabavna cijena");
 
+        txtNabavnaCijena.setBackground(new java.awt.Color(204, 255, 255));
+
+        lstGoriva.setBackground(new java.awt.Color(204, 255, 255));
         lstGoriva.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(lstGoriva);
 
@@ -238,7 +291,7 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         pnlDatumNarudzbe.setLayout(pnlDatumNarudzbeLayout);
         pnlDatumNarudzbeLayout.setHorizontalGroup(
             pnlDatumNarudzbeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 170, Short.MAX_VALUE)
+            .addGap(0, 162, Short.MAX_VALUE)
         );
         pnlDatumNarudzbeLayout.setVerticalGroup(
             pnlDatumNarudzbeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -249,7 +302,7 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         pnlDatumIsporuke.setLayout(pnlDatumIsporukeLayout);
         pnlDatumIsporukeLayout.setHorizontalGroup(
             pnlDatumIsporukeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 161, Short.MAX_VALUE)
         );
         pnlDatumIsporukeLayout.setVerticalGroup(
             pnlDatumIsporukeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -281,7 +334,6 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
                             .addComponent(txtKolicina)
                             .addComponent(txtNabavnaCijena)
                             .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(pnlDatumIsporuke, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtVrijemeIsporuke)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -289,8 +341,9 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
                                     .addComponent(jLabel3)
                                     .addComponent(jLabel2)
                                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(pnlDatumNarudzbe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE))))
+                                    .addComponent(pnlDatumNarudzbe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(pnlDatumIsporuke, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 8, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -379,15 +432,15 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
             cmbBenzinskaCrpka.setSelectedItem(entitet.getBenzinskaCrpka());
             txtNabavnaCijena.setText(narudzbaGorivo.getNabavnaCijena().toString());
             txtKolicina.setText(narudzbaGorivo.getKolicina().toString());
-            cmbGorivo.setSelectedItem(narudzbaGorivo.getGorivo());
-            cmbBenzinskaCrpka.setSelectedItem(entitet.getBenzinskaCrpka());
+            cmbGorivo.setSelectedItem(entitet.getNarudzbaGoriva().contains(Gorivo));
 
-            DefaultListModel<Gorivo> go = new DefaultListModel<>();
-            lstGoriva.setModel(go);
-            goriva.forEach((s) -> {
-                go.addElement(s);
-            });
+//            cmbBenzinskaCrpka.setSelectedItem(entitet.getBenzinskaCrpka());
 
+//            DefaultListModel<Gorivo> go = new DefaultListModel<>();
+//            lstGoriva.setModel(go);
+//            goriva.forEach((s) -> {
+//                go.addElement(s);
+//            });
             ucitajGoriva();
 
         } catch (Exception e) {
@@ -397,7 +450,7 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
 
     private void btnDodajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDodajActionPerformed
         entitet = new NarudzbaCisterne();
-        
+
         spremi();
     }//GEN-LAST:event_btnDodajActionPerformed
 
@@ -415,8 +468,11 @@ public class FormaNarudzbaCisterne extends Forma<NarudzbaCisterne> {
         entitet.setVrijemeIsporuke(Date.from(datumIsporuke.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         entitet.setTrosak(new BigDecimal(txtTrosak.getText()));
         entitet.setBenzinskaCrpka(cmbBenzinskaCrpka.getItemAt(cmbBenzinskaCrpka.getSelectedIndex()));
-        narudzbaGorivo.setKolicina(new BigDecimal(txtKolicina.getText()));
-        narudzbaGorivo.setNabavnaCijena(new BigDecimal(txtNabavnaCijena.getText()));
+        entitet.setNarudzbaGoriva((List<NarudzbaGorivo>) new BigDecimal(txtKolicina.getText()));
+        entitet.setNarudzbaGoriva((List<NarudzbaGorivo>) new BigDecimal(txtNabavnaCijena.getText()));
+
+        //narudzbaGorivo.setKolicina(new BigDecimal(txtKolicina.getText()));
+        //narudzbaGorivo.setNabavnaCijena(new BigDecimal(txtNabavnaCijena.getText()));
         narudzbaGorivo.setGorivo(cmbGorivo.getItemAt(cmbGorivo.getSelectedIndex()));
 
         super.spremi();

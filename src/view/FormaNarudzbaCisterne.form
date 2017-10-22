@@ -46,7 +46,6 @@
                           <Component id="txtKolicina" max="32767" attributes="0"/>
                           <Component id="txtNabavnaCijena" alignment="0" max="32767" attributes="0"/>
                           <Component id="jLabel8" max="32767" attributes="0"/>
-                          <Component id="pnlDatumIsporuke" alignment="0" max="32767" attributes="0"/>
                           <Component id="txtVrijemeIsporuke" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -54,9 +53,10 @@
                                   <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel7" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
-                                  <Component id="pnlDatumNarudzbe" min="-2" max="-2" attributes="0"/>
+                                  <Component id="pnlDatumNarudzbe" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="pnlDatumIsporuke" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="8" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -151,6 +151,9 @@
       <SubComponents>
         <Component class="javax.swing.JList" name="lstNarudzba">
           <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="cc" type="rgb"/>
+            </Property>
             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
               <StringArray count="0"/>
             </Property>
@@ -173,6 +176,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtVrijemeNarudzbe">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="cc" type="rgb"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
@@ -185,6 +193,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtVrijemeIsporuke">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="cc" type="rgb"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnDodaj">
       <Properties>
@@ -211,6 +224,11 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="txtTrosak">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="cc" type="rgb"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel6">
       <Properties>
@@ -256,6 +274,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtKolicina">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="cc" type="rgb"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel8">
       <Properties>
@@ -263,6 +286,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtNabavnaCijena">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="cc" type="rgb"/>
+        </Property>
+      </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane2">
       <AuxValues>
@@ -273,6 +301,9 @@
       <SubComponents>
         <Component class="javax.swing.JList" name="lstGoriva">
           <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="cc" type="rgb"/>
+            </Property>
             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
               <StringArray count="0"/>
             </Property>
@@ -297,7 +328,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="170" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="162" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -312,7 +343,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="161" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
